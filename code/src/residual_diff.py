@@ -369,14 +369,15 @@ class ResidualDiffusion(nn.Module):
         loss = reduce(loss, 'b ... -> b (...)', 'mean') #[1, 196608]
         
         # fourier_res_penalty = abs(torch.fft.fft2(pred_res)).mean()
-        x_0_pred = self.predict_start_from_res_noise(xt, t, pred_res, pred_noise)
-        x_0_LR = tensor_singular_value_thresholding(x_start, tau=1.0) #tau=0.1
-        LR_loss = F.mse_loss(x_0_pred, x_0_LR)
+
+        # x_0_pred = self.predict_start_from_res_noise(xt, t, pred_res, pred_noise)
+        # x_0_LR = tensor_singular_value_thresholding(x_start, tau=1.0) #tau=0.1
+        # LR_loss = F.mse_loss(x_0_pred, x_0_LR)
         # visualize_tensor(x_start)
         # visualize_tensor(x_0_LR)
         # exit(0)
 
-        return loss.mean() + 0.2 * LR_loss.mean()
+        return loss.mean() #+ 0.2 * LR_loss.mean()
 
 
     def forward(self, data, *args, **kwargs):

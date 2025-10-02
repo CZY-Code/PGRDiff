@@ -6,7 +6,7 @@
     * `git clone https://github.com/CZY-Code/PGRDiff.git`
     * Download the datasets
         - [DUNHUANG](https://www.kaggle.com/datasets/xuhangc/dunhuang-grottoes-painting-dataset-and-benchmark)
-        - [muralv2](https://sipi.usc.edu/database/database.php)
+        - *muralv2* **Come soon**
    
 2.  Pip install dependencies:
     ```
@@ -24,12 +24,30 @@ Unzip and move dataset into ROOT/dataset or ROOT/data
         ├──muralv2
         │   ├── images
         │   ├── masks
+        ├── install.yaml
+        ├── README.md
 
-## Run and test
-* Inpainting: `./Inpainting.sh`
-* Denoising: `./Denoising.sh`
-* Upsampling `./Upsampling.sh`
+## Training
+```
+cd ./code
+python train.py
+```
+or
+```
+accelerate launch train.py
+```
     
+## Evaluation
+```
+cd ./code
+python metric.py
+```
+## Pre-trained Models
+
+
 ## Acknowledgement
 This implementation is based on / inspired by:
-* [reproducible-tensor-completion-state-of-the-art](https://github.com/zhaoxile/reproducible-tensor-completion-state-of-the-art)
+* [RDMM](https://github.com/nachifur/RDDM)
+* [IR-SDE](https://github.com/Algolzw/image-restoration-sde)
+* [LRDiff](https://github.com/CZY-Code/LRDiff)
+* [StrDiffusion](https://github.com/htyjers/StrDiffusion)
