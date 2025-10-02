@@ -1,0 +1,11 @@
+/.vscode
+/DUNHUANG
+/muralv2
+/code/demo*/
+/code/results/
+/code/*.json
+/code/*.png
+/code/visualization.py
+__pycache__
+/*.txt
+/*.zip
