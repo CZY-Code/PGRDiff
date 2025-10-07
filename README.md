@@ -1,4 +1,4 @@
-# Prompt-Guided Residual Diffusion for All-in-One Mural Restoration
+# All-in-One Mural Restoration with Prompt-Guided Residual Diffusion
 
 ## Installation
 
@@ -6,7 +6,7 @@
     * `git clone https://github.com/CZY-Code/PGRDiff.git`
     * Download the datasets
         - [DUNHUANG](https://www.kaggle.com/datasets/xuhangc/dunhuang-grottoes-painting-dataset-and-benchmark)
-        - *muralv2* **Come soon**
+        - *muralv2* **Coming soon**
    
 2.  Pip install dependencies:
     ```
@@ -14,7 +14,7 @@
     ```
 
 ## Dataset Preparation
-Unzip and move dataset into ROOT/dataset or ROOT/data
+Unzip and move dataset into ROOT
 
 ### Directory structure of dataset          
         ├── code                     
