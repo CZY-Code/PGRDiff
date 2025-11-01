@@ -10,7 +10,6 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchvision import utils
 from tqdm.auto import tqdm
-
 from .utils import *
 
 # trainer class
@@ -141,8 +140,8 @@ class Trainer(object):
         self.ema.ema_model.eval()
         data = next(self.sample_loader)
         x_input_sample = [item.to(self.device) for item in data[:-1]]
-        x_input_sample.append(data[-1]) # text不需要to(device)
-        show_x_input_sample = x_input_sample[:2] #可视化img0、img1
+        x_input_sample.append(data[-1]) # text no need .to(device)
+        show_x_input_sample = x_input_sample[:2] #可视化img0,img1
 
         all_images_list = show_x_input_sample + list(self.ema.ema_model.sample(x_input_sample, batch_size=self.num_samples))
         all_images = torch.cat(all_images_list, dim=0)
@@ -162,7 +161,7 @@ class Trainer(object):
         self.ema.ema_model.eval()
         loader = DataLoader(dataset=self.sample_dataset, batch_size=1)
         i = 0
-        save_image_path = [
+        save_images = [
             '1-dunhuang-beiliang&beiwei_img194.jpg',
             '2-xiwei_img234.jpg',
             '3-dunhuang-beizhou_img122.jpg',
@@ -177,22 +176,22 @@ class Trainer(object):
         for data in loader:
             file_name = self.sample_dataset.load_name(i, sub_dir=self.sub_dir)
             i += 1
-            # if file_name in save_image_path:
+            # if file_name in save_images:
             with torch.no_grad():
                 x_input_sample = [item.to(self.device) for item in data[:-1]]
                 x_input_sample.append(data[-1]) # text不需要to(device)
                 show_x_input_sample = x_input_sample[:2]
                 all_images_list = show_x_input_sample + list(self.ema.ema_model.sample(x_input_sample, batch_size=self.num_samples, last=last))
-
             all_images = torch.cat(all_images_list, dim=0) #[4, 3, 256, 256] [23, 3, 256, 256]
+            
             if last:
                 nrow = int(math.sqrt(self.num_samples))
             else:
                 nrow = all_images.shape[0]
-            # utils.save_image(all_images, str(self.results_folder / file_name), nrow=nrow)
+            utils.save_image(all_images, str(self.results_folder / file_name), nrow=nrow)
             
-            # with open('./results/prompt.txt', 'a+', encoding='utf-8') as f:
-            #     f.write(file_name+' '+ str(data[-1])+'\n')
+            with open('./results/prompt.txt', 'a+', encoding='utf-8') as f:
+                f.write(file_name+' '+ str(data[-1])+'\n')
             utils.save_image(all_images_list[-1], str('./results/Ours-DH/' + file_name))
             utils.save_image(all_images_list[0], str('./results/GT-DH/' + file_name))
             utils.save_image(all_images_list[1], str('./results/Input-DH/' + file_name))

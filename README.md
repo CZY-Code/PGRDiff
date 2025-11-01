@@ -6,7 +6,7 @@
     * `git clone https://github.com/CZY-Code/PGRDiff.git`
     * Download the datasets
         - [DUNHUANG](https://www.kaggle.com/datasets/xuhangc/dunhuang-grottoes-painting-dataset-and-benchmark)
-        - *muralv2* **Coming soon**
+        - [muralv2](https://pan.quark.cn/s/9d262b933f87)
    
 2.  Pip install dependencies:
     ```

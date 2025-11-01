@@ -105,14 +105,14 @@ class ResidualDiffusion(nn.Module):
         posterior_log_variance_clipped = extract(self.posterior_log_variance_clipped, t, x_t.shape)
         return posterior_mean, posterior_variance, posterior_log_variance_clipped
 
-    def model_predictions(self, x_input, x, time, x_input_condition=None, text_embd = None, clip_denoised=True):
+    def model_predictions(self, x_input, x, time, x_input_condition=None, text_embed = None, clip_denoised=True):
         if self.input_condition:
             x_in = torch.cat((x, x_input, x_input_condition), dim=1)
         else:
             x_in = torch.cat((x, x_input), dim=1)
             # x_in = x_input - x
 
-        model_output = self.unet_model(x_in, time, text_embd)
+        model_output = self.unet_model(x_in, time, text_embed)
         maybe_clip = partial(torch.clamp, min=-1.0, max=1.0) if clip_denoised else identity
 
         if self.objective == 'pred_res_noise':
@@ -205,8 +205,8 @@ class ResidualDiffusion(nn.Module):
         else:
             x_input_condition = None
         x_input = data[1]
-        text_embd = self.textModel(data[5]) #[1, 384]
-
+        text_embed = self.textModel(data[5]) #[1, 384]
+        
         batch, device = shape[0], self.betas.device
         total_timesteps, sampling_timesteps, eta = self.num_timesteps, self.sampling_timesteps, self.ddim_sampling_eta
         # [-1, 0, 1, 2, ..., T-1] when sampling_timesteps == total_timesteps
@@ -223,7 +223,7 @@ class ResidualDiffusion(nn.Module):
 
         for time, time_next in tqdm(time_pairs, desc='sampling loop time step'):
             time_cond = torch.full((batch,), time, device=device, dtype=torch.long)
-            preds = self.model_predictions(x_input, img, time_cond, x_input_condition, text_embd)
+            preds = self.model_predictions(x_input, img, time_cond, x_input_condition, text_embed)
 
             pred_res = preds.pred_res
             pred_noise = preds.pred_noise
@@ -304,10 +304,9 @@ class ResidualDiffusion(nn.Module):
         # x_alpha = data[2]
         # x_degra = data[3]
         x_mask = data[4]
-        text_embd = self.textModel(data[5]) #[1, 384]
+        text_embed = self.textModel(data[5]) #[1, 384]
 
         if self.input_condition:
-            # x_input_condition = x_alpha * x_degra
             x_input_condition = x_mask
         else:
             x_input_condition = None
@@ -319,13 +318,19 @@ class ResidualDiffusion(nn.Module):
         xt = self.q_sample(x_start, x_res, t, noise=noise)
 
         # predict and take gradient step
-        if self.input_condition:
+        if self.input_condition: #进这个
             x_in = torch.cat((xt, x_input, x_input_condition), dim=1)
-        else: #进这个
-            # x_in = x_input - xt #[B, 3, 256, 256]
+        else: 
             x_in = torch.cat((xt, x_input), dim=1) #[B, 6, 256, 256]
-            
-        model_out = self.unet_model(x_in, t, text_embd) #[1, 3, 256, 256], [1, 3, 256, 256]
+        
+        # from thop import profile
+        # flops, params = profile(self.unet_model, inputs=(x_in, t, text_embed))
+        # gflops = flops / 1e9
+        # print(f"gFLOPs: {gflops}")
+        # print(f"number of parameters: {params/1e6} M")
+        # exit(0)
+
+        model_out = self.unet_model(x_in, t, text_embed) #[1, 3, 256, 256], [1, 3, 256, 256]
 
         target = []
         if self.objective == 'pred_res_noise':

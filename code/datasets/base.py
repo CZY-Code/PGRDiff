@@ -65,9 +65,7 @@ class DunhangDataset(Dataset):
 
     def __getitem__(self, index):
         img0 = Image.open(self.gt[index])
-        # img0 = Image.open('/home/chengzy/PGRDiff/muralv2/images/9-dunhuang-wudai&song/img146_2.jpg')
         img0 = convert_image_to_fn(self.convert_image_to, img0) if self.convert_image_to else img0
-        # img0 = self.pad_img(img0, self.image_size) #转numpy
         img0 = np.asarray(img0) #转numpy
         if self.crop_patch:
             img0 = self.get_patch(img0, 512)
@@ -75,10 +73,7 @@ class DunhangDataset(Dataset):
         selected_mask = random.choice(self.masks)
         # selected_mask = Path(os.path.abspath('/home/chengzy/PGRDiff/muralv2/masks/Crack/18.png'))
         damage_type = self.damage_type_dict.get(selected_mask.parts[6], "general damage")
-        mask = Image.open(selected_mask)
-        # mask = Image.open(self.masks[index % len(self.masks)])
-        mask = convert_image_to_fn('RGBA', mask) if self.convert_image_to else mask
-        mask = np.asarray(mask) #[600, 600, 4]
+        mask = np.asarray(Image.open(selected_mask).convert('RGBA')) #[600, 600, 4]
         
         images = [[img0, mask]]
         p = Augmentor.DataPipeline(images)
@@ -93,27 +88,29 @@ class DunhangDataset(Dataset):
         deg_rgb = mask_rgba[..., :3]  # (H,W,3) #[0,1]
         alpha = mask_rgba[..., 3:] / 255.0  # (H,W,1)
         # deg_rgb = np.where(deg_rgb>0, 255, 0).astype(np.uint8) #
-        # alpha = np.where(alpha>=0.5, 1.0, alpha) #TODO
+        # alpha = np.where(alpha>=0.2, 1.0, alpha) #TODO
         img1 = (deg_rgb * alpha + img0 * (1 - alpha)).astype(np.uint8)
         
-        # cv2.imwrite("img0.jpg", cv2.cvtColor(img0, cv2.COLOR_RGB2BGR))  # 保存图像
-        # cv2.imwrite("img1.jpg", cv2.cvtColor(img1, cv2.COLOR_RGB2BGR))  # 保存图像
-        # cv2.imwrite("deg.jpg", cv2.cvtColor(np.where(deg_rgb==0, 255, deg_rgb), cv2.COLOR_RGB2BGR))  # 保存图像
-        # cv2.imwrite("alpha.jpg", (1 - alpha) * 255)  # 保存图像
-        # cv2.imwrite("mask.jpg", np.where(alpha > 0, 0, 255).astype(np.uint8))  # 保存图像
-        # cv2.imwrite("res.jpg", cv2.cvtColor(img1-img0, cv2.COLOR_RGB2BGR))  # 保存图像
+        # cv2.imwrite("img0.jpg", cv2.cvtColor(img0, cv2.COLOR_RGB2BGR))
+        # cv2.imwrite("img1.jpg", cv2.cvtColor(img1, cv2.COLOR_RGB2BGR))
+        # cv2.imwrite("deg.jpg", cv2.cvtColor(np.where(deg_rgb==0, 255, deg_rgb), cv2.COLOR_RGB2BGR))
+        # cv2.imwrite("alpha.jpg", (1 - alpha) * 255)
+        # cv2.imwrite("mask.jpg", np.where(alpha > 0, 0, 255).astype(np.uint8))
+        # cv2.imwrite("res.jpg", cv2.cvtColor(img1-img0, cv2.COLOR_RGB2BGR))
         # exit(0)
 
         alpha = torch.from_numpy(alpha.transpose((2, 0, 1))).contiguous().float()
         mask = torch.where(alpha > 0, torch.ones_like(alpha), torch.zeros_like(alpha))
         damage_level = self.damage_level[int(torch.sum(alpha) / torch.sum(mask) * len(self.damage_level))]
-        # 定义变量
+        mask = torch.where(alpha > 0.5, torch.ones_like(alpha), torch.zeros_like(alpha)) #BUG
         dynasty = "Tang"  # 朝代
         location = "Dunhuang Mogao Grottoes"  # 地点
         prompt = f"Please restore the mural from the {dynasty} period located in {location}, focusing on addressing the {damage_level} {damage_type} issues."
-        return [self.to_tensor(img0), self.to_tensor(img1), 
-                alpha, self.to_tensor(deg_rgb), 
-                mask, prompt]
+        # prompt = f"Kindly carry out restoration for the {dynasty}-era mural at {location}, focusing on tackling the {damage_level} {damage_type} problems."
+        # prompt = f"Conduct restoration for the {dynasty} mural in {location}, resolving {damage_level} {damage_type} to meet cultural heritage preservation standards."
+        # prompt = f"Carry out restoration on the {dynasty} mural in {location}, focusing on solving {damage_level} {damage_type} while preserving original pigment colors."
+        # prompt = "restore the mural"
+        return [self.to_tensor(img0), self.to_tensor(img1), alpha, self.to_tensor(deg_rgb), mask, prompt]
 
     def load_flist(self, flist):
         if isinstance(flist, list):
@@ -208,7 +205,6 @@ class MuralDataset(Dataset):
         else: #train
             self.gt = self.image_list[:train_num]
             
-
         self.image_size = image_size
         self.convert_image_to = convert_image_to
 
@@ -248,10 +244,9 @@ class MuralDataset(Dataset):
             img0 = self.get_patch(img0, 512)
         img0 = self.cv2equalizeHist(img0) if self.equalizeHist else img0
         selected_mask = random.choice(self.masks)
+        # selected_mask = self.masks[index % len(self.masks)] #TODO
         damage_type = self.damage_type_dict.get(selected_mask.parts[6], "general damage")
-        mask = Image.open(selected_mask)
-        mask = convert_image_to_fn('RGBA', mask) if self.convert_image_to else mask
-        mask = np.asarray(mask) #[600, 600, 4]
+        mask = np.asarray(Image.open(selected_mask).convert('RGBA')) #[600, 600, 4]
         
         images = [[img0, mask]]
         p = Augmentor.DataPipeline(images)
@@ -266,28 +261,24 @@ class MuralDataset(Dataset):
         deg_rgb = mask_rgba[..., :3]  # (H,W,3) #[0,1]
         alpha = mask_rgba[..., 3:] / 255.0  # (H,W,1)，扩展维度便于广播
         # deg_rgb = np.where(deg_rgb > 0, 255, 0).astype(np.uint8) #TODO
-        # alpha = np.where(alpha > 0.5, 0.8, alpha) #TODO
+        # alpha = np.where(alpha > 0.2, 0.2, alpha) #TODO
         img1 = (deg_rgb * alpha + img0 * (1 - alpha)).astype(np.uint8)
         
-        # cv2.imwrite("img0.jpg", cv2.cvtColor(img0, cv2.COLOR_RGB2BGR))  # 保存图像
-        # cv2.imwrite("img1.jpg", cv2.cvtColor(img1, cv2.COLOR_RGB2BGR))  # 保存图像
-        # cv2.imwrite("deg.jpg", cv2.cvtColor(np.where(deg_rgb==0, 255, deg_rgb), cv2.COLOR_RGB2BGR))  # 保存图像
-        # cv2.imwrite("alpha.jpg", (1 - alpha) * 255)  # 保存图像
-        # cv2.imwrite("mask.jpg", np.where(alpha > 0, 0, 255).astype(np.uint8))  # 保存图像
-        # cv2.imwrite("res.jpg", cv2.cvtColor(img1-img0, cv2.COLOR_RGB2BGR))  # 保存图像
+        # cv2.imwrite("img0.jpg", cv2.cvtColor(img0, cv2.COLOR_RGB2BGR))
+        # cv2.imwrite("img1.jpg", cv2.cvtColor(img1, cv2.COLOR_RGB2BGR))
+        # cv2.imwrite("deg.jpg", cv2.cvtColor(np.where(deg_rgb==0, 255, deg_rgb), cv2.COLOR_RGB2BGR))
+        # cv2.imwrite("alpha.jpg", (1 - alpha) * 255)
+        # cv2.imwrite("mask.jpg", np.where(alpha > 0, 0, 255).astype(np.uint8))
+        # cv2.imwrite("res.jpg", cv2.cvtColor(img1-img0, cv2.COLOR_RGB2BGR))
         # exit(0)
 
         alpha = torch.from_numpy(alpha.transpose((2, 0, 1))).contiguous().float()
         mask = torch.where(alpha > 0, torch.ones_like(alpha), torch.zeros_like(alpha))
         damage_level = self.damage_level[int(torch.sum(alpha) / torch.sum(mask) * len(self.damage_level))]
-        # damage_level = 'serious' #TODO
-        # 定义变量
         dynasty = self.dynasty_dict.get(self.gt[index].parts[6], "Tang")
-        location = "Dunhuang Mogao Grottoes"  # 地点
+        location = "Dunhuang Mogao Grottoes"
         prompt = f"Please restore the mural from the {dynasty} period located in {location}, focusing on addressing the {damage_level} {damage_type} issues."
-        return [self.to_tensor(img0), self.to_tensor(img1), 
-                alpha, self.to_tensor(deg_rgb), 
-                mask, prompt]
+        return [self.to_tensor(img0), self.to_tensor(img1), alpha, self.to_tensor(deg_rgb), mask, prompt]
 
     def load_flist(self, flist):
         if isinstance(flist, list):

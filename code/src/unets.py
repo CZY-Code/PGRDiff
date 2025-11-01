@@ -19,7 +19,6 @@ class Unet(nn.Module):
         input_condition=False
     ):
         super().__init__()
-        # determine dimensions
         self.channels = channels
         input_channels = 2 * channels + 1 * (1 if input_condition else 0)
 
@@ -103,7 +102,9 @@ class Unet(nn.Module):
         for block1, icb, block2, attn, downsample in self.downs:
             x = block1(x, t)
             h.append(x)
+            # visualize_features(x, time, 'before')
             x = icb(x, textemb)
+            # visualize_features(x, time, 'after')
             x = block2(x, t)
             x = attn(x)
             h.append(x)
@@ -306,3 +307,36 @@ class UnetRes(nn.Module):
             out_res_add_noise = self.final_conv_2(x)
 
             return out_res, out_res_add_noise
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+def visualize_features(features, time, state, num_channels=1, figsize=(6, 5)):
+    """
+    可视化特征张量
+    
+    参数:
+        features: 输入特征张量，形状 [1, C, H, W]
+        num_channels: 展示的单通道数量
+        figsize: 图像大小
+    """
+    # 去除batch维度，得到 [C, H, W]
+    features = features.squeeze(0)  # 变为 [64, 256, 256]
+    C, H, W = features.shape
+
+    plt.figure(figsize=figsize)
+    # plt.suptitle("Single Channel Features (Heatmap)", fontsize=16)
+
+    selected_channels = np.random.choice(C, size=num_channels, replace=False)
+    # selected_channels = np.arange(num_channels)  # 选择前N个通道
+    
+    for c in selected_channels:
+        # plt.subplot(2, num_channels//2, i+1)
+        channel_data = features[c].detach().cpu().numpy()
+        channel_data = (channel_data - channel_data.min()) / (channel_data.max() - channel_data.min() + 1e-8)
+        plt.imshow(channel_data, cmap='viridis')
+        # plt.title(f"Channel {c}")
+        plt.axis('off')
+        plt.tight_layout()
+        plt.savefig(f"Channel_{c}_{time.item()}_state_{state}.png", bbox_inches='tight')
+        plt.show()

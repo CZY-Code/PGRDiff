@@ -20,7 +20,7 @@ input_condition = True
 input_condition_mask = False
 is_dunhuang = True
 if is_dunhuang:
-    folder = ["/home/chengzy/PGRDiff/DUNHUANG/train/train_GT", "/home/chengzy/PGRDiff/muralv2/masks/WaterStains"]
+    folder = ["/home/chengzy/PGRDiff/DUNHUANG/train/train_GT", "/home/chengzy/PGRDiff/muralv2/masks"]
 else:
     folder = ["/home/chengzy/PGRDiff/muralv2/images", "/home/chengzy/PGRDiff/muralv2/masks"]
 
@@ -69,11 +69,14 @@ trainer = Trainer(
 #     trainer.load('50')
     
 # train
-# trainer.train()
+trainer.train()
 
 # test
 if trainer.accelerator.is_local_main_process:
     trainer.load('50-PG-512-DH')
     trainer.set_results_folder('./results/test_timestep_'+str(sampling_timesteps))
-    trainer.test(last=True)
-    compare_images('./results/Ours-DH/', './results/GT-DH/')
+    trainer.test(last=False)
+    if is_dunhuang:
+        compare_images('./results/Ours-DH/', './results/GT-DH/')
+    else:
+        compare_images('./results/Ours-TEN/', './results/GT-TEN/')

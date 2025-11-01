@@ -121,6 +121,7 @@ class ResnetBlock(nn.Module):
 
         h = self.block1(x, scale_shift=scale_shift)
         h = self.block2(h)
+        
         return h + self.res_conv(x)
 
 
