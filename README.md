@@ -43,11 +43,14 @@ cd ./code
 python metric.py
 ```
 ## Pre-trained Models
-
+    * Download the weights of trained models
+        - [For DUNHUANG](https://pan.quark.cn/s/316e16471bac)
+        - [For muralv2](https://pan.quark.cn/s/c1569713bd45)
+    * Move the weights into the folder `./code/results/sample/`
 
 ## Acknowledgement
 This implementation is based on / inspired by:
-* [RDMM](https://github.com/nachifur/RDDM)
+* [RDDM](https://github.com/nachifur/RDDM)
 * [IR-SDE](https://github.com/Algolzw/image-restoration-sde)
 * [LRDiff](https://github.com/CZY-Code/LRDiff)
 * [StrDiffusion](https://github.com/htyjers/StrDiffusion)
