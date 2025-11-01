@@ -43,10 +43,10 @@ cd ./code
 python metric.py
 ```
 ## Pre-trained Models
-    * Download the weights of trained models
-        - [For DUNHUANG](https://pan.quark.cn/s/316e16471bac)
-        - [For muralv2](https://pan.quark.cn/s/c1569713bd45)
-    * Move the weights into the folder `./code/results/sample/`
+* Download the weights of trained models
+    - [Weight for DUNHUANG](https://pan.quark.cn/s/316e16471bac)
+    - [Weight for muralv2](https://pan.quark.cn/s/c1569713bd45)
+* Move the weights into the folder `./code/results/sample/`
 
 ## Acknowledgement
 This implementation is based on / inspired by:
