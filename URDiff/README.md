@@ -1,4 +1,4 @@
-# All-in-One Mural Restoration with Prompt-Guided Residual Diffusion
+# Learning Mural Restoration from Degraded Data via Unsupervised Low-rank Residual Diffusion
 
 ## Installation
 
@@ -6,7 +6,7 @@
     * `git clone https://github.com/CZY-Code/PGRDiff.git`
     * Download the datasets
         - [DUNHUANG](https://www.kaggle.com/datasets/xuhangc/dunhuang-grottoes-painting-dataset-and-benchmark)
-        - [muralv2] (https://pan.quark.cn/s/737e3843ce53?pwd=d8zT)
+        - [muralv2](https://pan.quark.cn/s/737e3843ce53?pwd=d8zT)
         
    
 2.  Pip install dependencies:
@@ -43,11 +43,12 @@ accelerate launch train.py
 cd ./code
 python metric.py
 ```
-## Pre-trained Models
+
+<!-- ## Pre-trained Models
 * Download the weights of trained models
-    - [Weight for DUNHUANG](https://pan.quark.cn/s/f75148cab005?pwd=Lsi3)
-    - [Weight for muralv2](https://pan.quark.cn/s/197e10e66555?pwd=VY36)
-* Move the weights into the folder `./code/results/sample/`
+    - [Weight for DUNHUANG](https://pan.quark.cn/s/316e16471bac)
+    - [Weight for muralv2](https://pan.quark.cn/s/c1569713bd45)
+* Move the weights into the folder `./code/results/sample/` -->
 
 ## Acknowledgement
 This implementation is based on / inspired by:
