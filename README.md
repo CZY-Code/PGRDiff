@@ -6,7 +6,7 @@
     * `git clone https://github.com/CZY-Code/PGRDiff.git`
     * Download the datasets
         - [DUNHUANG](https://www.kaggle.com/datasets/xuhangc/dunhuang-grottoes-painting-dataset-and-benchmark)
-        - [muralv2] (https://pan.quark.cn/s/737e3843ce53?pwd=d8zT)
+        - [muralv2](https://pan.quark.cn/s/737e3843ce53?pwd=d8zT)
         
    
 2.  Pip install dependencies:
@@ -17,16 +17,43 @@
 ## Dataset Preparation
 Unzip and move dataset into ROOT
 
-### Directory structure of dataset          
-        ├── code                     
-        ├── DUNHUANG
-        │   ├── train         
-        │   ├── test
-        ├──muralv2
-        │   ├── images
-        │   ├── masks
-        ├── install.yaml
-        ├── README.md
+### Directory structure of dataset     
+    ├── PGRDiff
+    │   ├── code
+    │   ├── DUNHUANG
+    │   │   ├── train
+    │   │   ├── test
+    │   ├── muralv2
+    │   │   ├── images
+    │   │   ├── masks
+    │   ├── install.yaml
+    │   ├── README.md
+
+## Training
+```
+cd ./code
+python train.py
+```
+or
+```
+accelerate launch train.py
+```
+    
+## Evaluation
+```
+cd ./code
+python metric.py
+```
+## Pre-trained Models
+    ├── code                     
+    ├── DUNHUANG
+    │   ├── train         
+    │   ├── test
+    ├──muralv2
+    │   ├── images
+    │   ├── masks
+    ├── install.yaml
+    ├── README.md
 
 ## Training
 ```

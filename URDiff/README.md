@@ -17,20 +17,22 @@
 ## Dataset Preparation
 Unzip and move dataset into ROOT
 
-### Directory structure of dataset          
-        ├── code                     
-        ├── DUNHUANG
-        │   ├── train         
-        │   ├── test
-        ├──muralv2
-        │   ├── images
-        │   ├── masks
-        ├── install.yaml
-        ├── README.md
+### Directory structure of dataset
+    ├── PGRDiff
+    |   ├── URDiff
+    │   ├── code
+    │   ├── DUNHUANG
+    │   │   ├── train
+    │   │   ├── test
+    │   ├── muralv2
+    │   │   ├── images
+    │   │   ├── masks
+    │   ├── install.yaml
+    │   ├── README.md
 
 ## Training
 ```
-cd ./code
+cd ./URDiff
 python train.py
 ```
 or
@@ -40,15 +42,15 @@ accelerate launch train.py
     
 ## Evaluation
 ```
-cd ./code
+cd ./URDiff
 python metric.py
 ```
 
-<!-- ## Pre-trained Models
+## Pre-trained Models
 * Download the weights of trained models
-    - [Weight for DUNHUANG](https://pan.quark.cn/s/316e16471bac)
-    - [Weight for muralv2](https://pan.quark.cn/s/c1569713bd45)
-* Move the weights into the folder `./code/results/sample/` -->
+    - [Weight for DUNHUANG] Coming soon
+    - [Weight for muralv2] Coming soon
+* Move the weights into the folder `./URDiff/results/sample/`
 
 ## Acknowledgement
 This implementation is based on / inspired by:
@@ -56,3 +58,6 @@ This implementation is based on / inspired by:
 * [IR-SDE](https://github.com/Algolzw/image-restoration-sde)
 * [LRDiff](https://github.com/CZY-Code/LRDiff)
 * [StrDiffusion](https://github.com/htyjers/StrDiffusion)
+* [AmbientDiff](https://github.com/giannisdaras/ambient-diffusion)
+* [EMDiff](https://github.com/francois-rozet/diffusion-priors)
+* [ConsistentDiff](https://github.com/giannisdaras/ambienttweedie)
